@@ -42,7 +42,7 @@ Introduce la contraseña de administrador y espera. Se comprueban los paquetes y
 
 ## Controles experimentales del codificador y registros
 
-La vista previa Linux incorpora un campo de **opciones H.264 avanzadas** para experimentar con receptores. Déjalo vacío para usar el perfil base que funciona: `320×240`, `15 fps`, H.264 Baseline nivel 1.2, `-g 15 -bf 0 -refs 1`, cabeceras repetidas, AAC 24 kHz / 48 kb/s y el transporte One-Seg fijo. Admite únicamente estas opciones de codificación: `-g`, `-keyint_min`, `-bf`, `-refs`, `-crf`, `-preset`, `-tune` y `-x264-params`. La aplicación mantiene fijos el transporte One-Seg, el servicio y el audio. Cada operación también guarda un registro en `~/.local/share/one-seg-studio/logs/`.
+La vista previa Linux muestra el **comando FFmpeg completo y editable** para experimentar con receptores. Su perfil base que funciona es `320×240`, `15 fps`, H.264 Baseline nivel 1.2, `-g 15 -bf 0 -refs 1`, cabeceras repetidas, AAC 24 kHz / 48 kb/s y los ajustes de transporte One-Seg. El usuario puede modificar argumentos de vídeo, audio, GOP y TS antes de preparar. Deben conservarse el marcador `INPUT`, el marcador final `OUTPUT` y el formato de salida `mpegts`. Cada operación también guarda un registro en `~/.local/share/one-seg-studio/logs/`.
 
 Abre **ONE SEG Studio** desde el menú de aplicaciones del escritorio Linux. Una sesión SSH sin escritorio gráfico no muestra la ventana.
 

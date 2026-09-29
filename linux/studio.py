@@ -30,8 +30,8 @@ TEXT = {
         'tested': 'Probado con Sony XDV-D500 · Linux beta', 'connection': 'CONEXIÓN HACKRF',
         'detect': 'Detectar HackRF', 'content': '  CONTENIDO', 'choose': '▱  Elegir vídeo…',
         'channel_quality': '  CANAL Y CALIDAD', 'video_bitrate': 'Bitrate de vídeo',
-        'advanced': 'Opciones H.264 avanzadas', 'advanced_hint': 'Base probada: -g 15 -bf 0 -refs 1 · Añade solo cambios experimentales',
-        'command_preview': 'Vista previa FFmpeg', 'show_command': 'Ver comando',
+        'ffmpeg_command': 'Comando FFmpeg editable', 'ffmpeg_hint': 'Puedes modificar vídeo, audio y GOP. INPUT y OUTPUT deben mantenerse.',
+        'reset_profile': 'Restaurar perfil base',
         'vga_gain': 'Ganancia VGA', 'rf_amp': 'Amplificador RF', 'output': '  Señal de salida',
         'graph': 'La gráfica aparecerá al emitir', 'log': 'Registro', 'stop': '■  Detener',
         'transmit': '▶  Iniciar emisión', 'prepare': '✧  Preparar vídeo', 'tools': 'Comprobar herramientas',
@@ -46,14 +46,14 @@ TEXT = {
         'dialog_video': 'Vídeo', 'choose_first': 'Elige primero un archivo de vídeo.',
         'dialog_prepare': 'Preparar vídeo', 'prepare_first': 'Prepara el vídeo con la configuración actual antes de emitir.',
         'file_dialog': 'Elegir vídeo', 'japan': 'Japón',
-        'log_saved': 'Registro guardado en', 'advanced_invalid': 'Opciones avanzadas no válidas · consulta el registro',
+        'log_saved': 'Registro guardado en',
     },
     'en': {
         'tested': 'Tested with Sony XDV-D500 · Linux beta', 'connection': 'HACKRF CONNECTION',
         'detect': 'Detect HackRF', 'content': '  CONTENT', 'choose': '▱  Choose video…',
         'channel_quality': '  CHANNEL & QUALITY', 'video_bitrate': 'Video bitrate',
-        'advanced': 'Advanced H.264 options', 'advanced_hint': 'Tested baseline: -g 15 -bf 0 -refs 1 · Add experimental changes only',
-        'command_preview': 'FFmpeg preview', 'show_command': 'Show command',
+        'ffmpeg_command': 'Editable FFmpeg command', 'ffmpeg_hint': 'Video, audio and GOP may be edited. Keep INPUT and OUTPUT.',
+        'reset_profile': 'Restore baseline',
         'vga_gain': 'VGA gain', 'rf_amp': 'RF amplifier', 'output': '  OUTPUT SIGNAL',
         'graph': 'The graph will appear during transmission', 'log': 'Log', 'stop': '■  Stop',
         'transmit': '▶  Start transmission', 'prepare': '✧  Prepare video', 'tools': 'Check tools',
@@ -68,7 +68,7 @@ TEXT = {
         'dialog_video': 'Video', 'choose_first': 'Choose a video file first.',
         'dialog_prepare': 'Prepare video', 'prepare_first': 'Prepare the video with the current settings before transmitting.',
         'file_dialog': 'Choose video', 'japan': 'Japan',
-        'log_saved': 'Log saved to', 'advanced_invalid': 'Invalid advanced options · see log',
+        'log_saved': 'Log saved to',
     },
 }
 
@@ -86,7 +86,8 @@ class Studio:
         self.rate = tk.StringVar(value='80')
         self.gain = tk.StringVar(value='47')
         self.amp = tk.BooleanVar(value=True)
-        self.advanced = tk.StringVar()
+        self.ffmpeg_command = tk.StringVar()
+        self.auto_ffmpeg_command = ''
         self.lang = 'es'
         self.language_choice = tk.StringVar(value='Español')
         self.device_detected = False
@@ -96,6 +97,7 @@ class Studio:
         self.file_subtitle = tk.StringVar(value=self.t('video_profile'))
         self.frequency_text = tk.StringVar()
         self.gain_text = tk.StringVar()
+        self.refresh_ffmpeg_command(force=True)
 
         window.title('ONE SEG Studio for vanhoteen · Linux preview')
         window.geometry('1180x790')
@@ -104,7 +106,7 @@ class Studio:
         self.configure_style()
         self.logo = self.load_logo()
         self.build()
-        for variable in (self.file, self.channel, self.rate, self.gain, self.amp, self.advanced):
+        for variable in (self.file, self.channel, self.rate, self.gain, self.amp, self.ffmpeg_command):
             variable.trace_add('write', self.changed)
         self.changed()
         window.protocol('WM_DELETE_WINDOW', self.close)
@@ -245,12 +247,12 @@ class Studio:
         for value in ('80', '100', '200', '300'):
             ttk.Radiobutton(rate_bar, text=f'{value}k', value=value, variable=self.rate,
                             style='Rate.TRadiobutton').pack(side='left', padx=(0, 2))
-        advanced_head = tk.Frame(right, bg=CARD)
-        advanced_head.pack(fill='x', pady=(5, 0))
-        self.label(advanced_head, self.t('advanced'), size=10, weight='bold').pack(side='left')
-        ttk.Button(advanced_head, text=self.t('show_command'), style='Soft.TButton', command=self.show_command).pack(side='right')
-        ttk.Entry(right, textvariable=self.advanced, font=('TkFixedFont', 9)).pack(fill='x', pady=(3, 1))
-        self.label(right, self.t('advanced_hint'), size=8, fg=MUTED).pack(anchor='w', pady=(0, 6))
+        command_head = tk.Frame(right, bg=CARD)
+        command_head.pack(fill='x', pady=(5, 0))
+        self.label(command_head, self.t('ffmpeg_command'), size=10, weight='bold').pack(side='left')
+        ttk.Button(command_head, text=self.t('reset_profile'), style='Soft.TButton', command=lambda: self.refresh_ffmpeg_command(force=True)).pack(side='right')
+        ttk.Entry(right, textvariable=self.ffmpeg_command, font=('TkFixedFont', 8)).pack(fill='x', pady=(3, 1))
+        self.label(right, self.t('ffmpeg_hint'), size=8, fg=MUTED).pack(anchor='w', pady=(0, 6))
         gain_head = tk.Frame(right, bg=CARD)
         gain_head.pack(fill='x', pady=(8, 0))
         self.label(gain_head, self.t('vga_gain'), size=11, weight='bold').pack(side='left')
@@ -305,11 +307,30 @@ class Studio:
         canvas.create_text(width // 2, height // 2, text=self.t('graph'), fill='#a8b2bd',
                            font=('TkDefaultFont', 10, 'bold'))
 
+    def safe_ffmpeg_command(self):
+        bitrate = int(self.rate.get())
+        peak = max(100, bitrate)
+        return (
+            "ffmpeg -y -hide_banner -loglevel warning -i INPUT -map 0:v:0 -map '0:a:0?' "
+            "-vf 'scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2,setsar=1' "
+            f"-r 15 -c:v libx264 -profile:v baseline -level:v 1.2 -pix_fmt yuv420p -b:v {bitrate}k "
+            f"-maxrate:v {peak}k -bufsize:v {peak}k -g 15 -bf 0 -refs 1 "
+            "-x264-params 'repeat-headers=1:aud=1:scenecut=0:force-cfr=1' "
+            "-c:a aac -ar 24000 -ac 2 -b:a 48k -mpegts_service_id 1544 "
+            "-mpegts_pmt_start_pid 4096 -streamid 0:256 -streamid 1:257 -muxrate 440563 -f mpegts OUTPUT"
+        )
+
+    def refresh_ffmpeg_command(self, force=False):
+        command = self.safe_ffmpeg_command()
+        if force or self.ffmpeg_command.get() == self.auto_ffmpeg_command:
+            self.ffmpeg_command.set(command)
+        self.auto_ffmpeg_command = command
+
     def snapshot(self):
         path = Path(self.file.get()).expanduser()
         stat = path.stat() if path.is_file() else None
         return (str(path.resolve()), self.channel.get(), self.rate.get(), self.gain.get(),
-                self.amp.get(), self.advanced.get(), (stat.st_size, stat.st_mtime_ns) if stat else None)
+                self.amp.get(), self.ffmpeg_command.get(), (stat.st_size, stat.st_mtime_ns) if stat else None)
 
     def changed(self, *_):
         self.prepared = None
@@ -320,6 +341,7 @@ class Studio:
         frequency = (473142857.142857 + (channel - 13) * 6000000) / 1e6
         self.frequency_text.set(f"{frequency:.6f} MHz  ·  {self.t('japan')}")
         self.gain_text.set(f'{self.gain.get()} dB')
+        self.refresh_ffmpeg_command()
 
     def choose(self):
         if self.process:
@@ -339,17 +361,6 @@ class Studio:
         if self.log_file:
             self.log_file.write(text)
             self.log_file.flush()
-
-    def show_command(self):
-        bitrate = self.rate.get()
-        extra = self.advanced.get().strip() or '(none)'
-        command = (f"Known-working baseline:\n"
-                   f"ffmpeg -i INPUT -vf 'scale=320:240:…' -r 15 -c:v libx264 "
-                   f"-profile:v baseline -level:v 1.2 -b:v {bitrate}k -maxrate:v {max(100, int(bitrate))}k "
-                   "-g 15 -bf 0 -refs 1 -x264-params repeat-headers=1:aud=1:scenecut=0:force-cfr=1 "
-                   "-c:a aac -ar 24000 -b:a 48k -f mpegts OUTPUT\n\n"
-                   f"Experimental additions: {extra}")
-        messagebox.showinfo(self.t('command_preview'), command)
 
     def set_status(self, text, color='#9ca1a7'):
         self.status_text.set(text)
