@@ -5,6 +5,8 @@ import signal
 import subprocess
 import sys
 import tempfile
+from datetime import datetime
+import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
@@ -28,6 +30,8 @@ TEXT = {
         'tested': 'Probado con Sony XDV-D500 · Linux beta', 'connection': 'CONEXIÓN HACKRF',
         'detect': 'Detectar HackRF', 'content': '  CONTENIDO', 'choose': '▱  Elegir vídeo…',
         'channel_quality': '  CANAL Y CALIDAD', 'video_bitrate': 'Bitrate de vídeo',
+        'advanced': 'Opciones H.264 avanzadas', 'advanced_hint': 'Base probada: -g 15 -bf 0 -refs 1 · Añade solo cambios experimentales',
+        'command_preview': 'Vista previa FFmpeg', 'show_command': 'Ver comando',
         'vga_gain': 'Ganancia VGA', 'rf_amp': 'Amplificador RF', 'output': '  Señal de salida',
         'graph': 'La gráfica aparecerá al emitir', 'log': 'Registro', 'stop': '■  Detener',
         'transmit': '▶  Iniciar emisión', 'prepare': '✧  Preparar vídeo', 'tools': 'Comprobar herramientas',
@@ -42,11 +46,14 @@ TEXT = {
         'dialog_video': 'Vídeo', 'choose_first': 'Elige primero un archivo de vídeo.',
         'dialog_prepare': 'Preparar vídeo', 'prepare_first': 'Prepara el vídeo con la configuración actual antes de emitir.',
         'file_dialog': 'Elegir vídeo', 'japan': 'Japón',
+        'log_saved': 'Registro guardado en', 'advanced_invalid': 'Opciones avanzadas no válidas · consulta el registro',
     },
     'en': {
         'tested': 'Tested with Sony XDV-D500 · Linux beta', 'connection': 'HACKRF CONNECTION',
         'detect': 'Detect HackRF', 'content': '  CONTENT', 'choose': '▱  Choose video…',
         'channel_quality': '  CHANNEL & QUALITY', 'video_bitrate': 'Video bitrate',
+        'advanced': 'Advanced H.264 options', 'advanced_hint': 'Tested baseline: -g 15 -bf 0 -refs 1 · Add experimental changes only',
+        'command_preview': 'FFmpeg preview', 'show_command': 'Show command',
         'vga_gain': 'VGA gain', 'rf_amp': 'RF amplifier', 'output': '  OUTPUT SIGNAL',
         'graph': 'The graph will appear during transmission', 'log': 'Log', 'stop': '■  Stop',
         'transmit': '▶  Start transmission', 'prepare': '✧  Prepare video', 'tools': 'Check tools',
@@ -61,6 +68,7 @@ TEXT = {
         'dialog_video': 'Video', 'choose_first': 'Choose a video file first.',
         'dialog_prepare': 'Prepare video', 'prepare_first': 'Prepare the video with the current settings before transmitting.',
         'file_dialog': 'Choose video', 'japan': 'Japan',
+        'log_saved': 'Log saved to', 'advanced_invalid': 'Invalid advanced options · see log',
     },
 }
 
@@ -69,6 +77,7 @@ class Studio:
     def __init__(self, window):
         self.window = window
         self.process = None
+        self.log_file = None
         self.prepared = None
         self.closing = False
         self.cancelled = False
@@ -77,6 +86,7 @@ class Studio:
         self.rate = tk.StringVar(value='80')
         self.gain = tk.StringVar(value='47')
         self.amp = tk.BooleanVar(value=True)
+        self.advanced = tk.StringVar()
         self.lang = 'es'
         self.language_choice = tk.StringVar(value='Español')
         self.device_detected = False
@@ -94,7 +104,7 @@ class Studio:
         self.configure_style()
         self.logo = self.load_logo()
         self.build()
-        for variable in (self.file, self.channel, self.rate, self.gain, self.amp):
+        for variable in (self.file, self.channel, self.rate, self.gain, self.amp, self.advanced):
             variable.trace_add('write', self.changed)
         self.changed()
         window.protocol('WM_DELETE_WINDOW', self.close)
@@ -235,6 +245,12 @@ class Studio:
         for value in ('80', '100', '200', '300'):
             ttk.Radiobutton(rate_bar, text=f'{value}k', value=value, variable=self.rate,
                             style='Rate.TRadiobutton').pack(side='left', padx=(0, 2))
+        advanced_head = tk.Frame(right, bg=CARD)
+        advanced_head.pack(fill='x', pady=(5, 0))
+        self.label(advanced_head, self.t('advanced'), size=10, weight='bold').pack(side='left')
+        ttk.Button(advanced_head, text=self.t('show_command'), style='Soft.TButton', command=self.show_command).pack(side='right')
+        ttk.Entry(right, textvariable=self.advanced, font=('TkFixedFont', 9)).pack(fill='x', pady=(3, 1))
+        self.label(right, self.t('advanced_hint'), size=8, fg=MUTED).pack(anchor='w', pady=(0, 6))
         gain_head = tk.Frame(right, bg=CARD)
         gain_head.pack(fill='x', pady=(8, 0))
         self.label(gain_head, self.t('vga_gain'), size=11, weight='bold').pack(side='left')
@@ -293,7 +309,7 @@ class Studio:
         path = Path(self.file.get()).expanduser()
         stat = path.stat() if path.is_file() else None
         return (str(path.resolve()), self.channel.get(), self.rate.get(), self.gain.get(),
-                self.amp.get(), (stat.st_size, stat.st_mtime_ns) if stat else None)
+                self.amp.get(), self.advanced.get(), (stat.st_size, stat.st_mtime_ns) if stat else None)
 
     def changed(self, *_):
         self.prepared = None
@@ -320,6 +336,20 @@ class Studio:
         self.log.insert('end', text)
         self.log.see('end')
         self.log.config(state='disabled')
+        if self.log_file:
+            self.log_file.write(text)
+            self.log_file.flush()
+
+    def show_command(self):
+        bitrate = self.rate.get()
+        extra = self.advanced.get().strip() or '(none)'
+        command = (f"Known-working baseline:\n"
+                   f"ffmpeg -i INPUT -vf 'scale=320:240:…' -r 15 -c:v libx264 "
+                   f"-profile:v baseline -level:v 1.2 -b:v {bitrate}k -maxrate:v {max(100, int(bitrate))}k "
+                   "-g 15 -bf 0 -refs 1 -x264-params repeat-headers=1:aud=1:scenecut=0:force-cfr=1 "
+                   "-c:a aac -ar 24000 -b:a 48k -f mpegts OUTPUT\n\n"
+                   f"Experimental additions: {extra}")
+        messagebox.showinfo(self.t('command_preview'), command)
 
     def set_status(self, text, color='#9ca1a7'):
         self.status_text.set(text)
@@ -329,6 +359,11 @@ class Studio:
         if self.process:
             return
         DATA.mkdir(parents=True, exist_ok=True)
+        logs = DATA / 'logs'
+        logs.mkdir(exist_ok=True)
+        self.log_file = (logs / f"one-seg-{datetime.now():%Y%m%d-%H%M%S}.log").open('w', encoding='utf-8')
+        self.log_file.write(f"ONE SEG Studio\nStarted: {datetime.now().isoformat()}\nCommand: {json.dumps(args)}\n\n")
+        self.append(f"{self.t('log_saved')} {self.log_file.name}\n")
         self.cancelled = False
         self.completed = completed
         self.output = tempfile.TemporaryFile()
@@ -339,6 +374,8 @@ class Studio:
                 env=dict(os.environ, ONESEG_DATA=str(DATA), PYTHONUNBUFFERED='1'))
         except OSError as error:
             self.output.close()
+            self.log_file.close()
+            self.log_file = None
             messagebox.showerror('ONE SEG Studio', str(error))
             return
         self.set_status(label, '#f5a623')
@@ -356,6 +393,9 @@ class Studio:
             self.window.after(100, self.poll)
             return
         self.output.close()
+        if self.log_file:
+            self.log_file.close()
+            self.log_file = None
         self.process = None
         for button in self.actions:
             button.config(state='normal')
@@ -392,7 +432,7 @@ class Studio:
                 self.prepared = snapshot
                 self.set_status(self.t('prepared'), GREEN)
         self.run([sys.executable, str(ROOT / 'prepare.py'), snapshot[0], snapshot[1],
-                  snapshot[3], snapshot[2], str(int(snapshot[4]))], self.t('preparing'), done)
+                  snapshot[3], snapshot[2], str(int(snapshot[4])), snapshot[5]], self.t('preparing'), done)
 
     def transmit(self):
         if self.prepared is None or self.prepared != self.snapshot():

@@ -40,6 +40,10 @@ bash INSTALL.sh
 
 Enter your administrator password and wait. The installer verifies the packages and installs ONE SEG Studio, TSDuck and the required Ubuntu dependencies, including GNU Radio, FFmpeg, Python and HackRF support. **Internet is required; no compilation is needed on the destination computer.** Existing dependencies are reused. The small download is not a self-contained runtime like the Mac DMG.
 
+## Experimental encoder controls and logs
+
+The Linux preview has an **Advanced H.264 options** field for receiver experiments. Leave it empty for the known-working baseline: `320×240`, `15 fps`, H.264 Baseline level 1.2, `-g 15 -bf 0 -refs 1`, repeat headers, AAC 24 kHz / 48 kb/s, and the fixed One-Seg transport. It accepts encoder-only flags: `-g`, `-keyint_min`, `-bf`, `-refs`, `-crf`, `-preset`, `-tune`, and `-x264-params`. The application keeps the One-Seg transport, service and audio settings fixed. Each operation also writes a log in `~/.local/share/one-seg-studio/logs/`.
+
 Open **ONE SEG Studio** from the desktop applications menu. A graphical desktop is required; a plain SSH terminal will not display the window.
 
 ## First use

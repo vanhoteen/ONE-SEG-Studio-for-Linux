@@ -40,6 +40,10 @@ bash INSTALL.sh
 
 Introduce la contraseña de administrador y espera. Se comprueban los paquetes y se instalan ONE SEG Studio, TSDuck y las dependencias de Ubuntu: GNU Radio, FFmpeg, Python y soporte para HackRF. **Necesita Internet; no hay que compilar en el ordenador de destino.** Reutiliza las dependencias existentes. No es un paquete autónomo como el DMG de Mac.
 
+## Controles experimentales del codificador y registros
+
+La vista previa Linux incorpora un campo de **opciones H.264 avanzadas** para experimentar con receptores. Déjalo vacío para usar el perfil base que funciona: `320×240`, `15 fps`, H.264 Baseline nivel 1.2, `-g 15 -bf 0 -refs 1`, cabeceras repetidas, AAC 24 kHz / 48 kb/s y el transporte One-Seg fijo. Admite únicamente estas opciones de codificación: `-g`, `-keyint_min`, `-bf`, `-refs`, `-crf`, `-preset`, `-tune` y `-x264-params`. La aplicación mantiene fijos el transporte One-Seg, el servicio y el audio. Cada operación también guarda un registro en `~/.local/share/one-seg-studio/logs/`.
+
 Abre **ONE SEG Studio** desde el menú de aplicaciones del escritorio Linux. Una sesión SSH sin escritorio gráfico no muestra la ventana.
 
 ## Primer uso

@@ -1,6 +1,6 @@
 """Prepare an isolated, finite One-Seg file test. Never starts RF."""
 from pathlib import Path
-import sys, subprocess, shutil, os
+import sys, subprocess, shutil, os, shlex
 root = Path(__file__).resolve().parent/'Payload'
 stage = Path(os.environ['ONESEG_DATA'])
 work = stage/'work/oneseg'
@@ -15,9 +15,32 @@ amplifier_arg = sys.argv[5] if len(sys.argv) > 5 else '0'
 if amplifier_arg not in ('0', '1'):
     raise ValueError('Amplificador no válido')
 amplifier = amplifier_arg == '1'
+
+# The frontend intentionally accepts encoder tuning only. Transport, service and
+# output arguments remain owned by ONE SEG Studio so an experiment cannot change
+# the generated One-Seg transport layout or run another program through a shell.
+raw_advanced = sys.argv[6] if len(sys.argv) > 6 else ''
+tokens = shlex.split(raw_advanced)
+allowed = {
+    '-g': 1, '-keyint_min': 1, '-bf': 1, '-refs': 1, '-crf': 1,
+    '-preset': 1, '-tune': 1, '-x264-params': 1,
+}
+advanced = []
+index = 0
+while index < len(tokens):
+    option = tokens[index]
+    count = allowed.get(option)
+    if count is None or index + count >= len(tokens):
+        raise ValueError(f'Unsupported advanced FFmpeg option: {option}')
+    value = tokens[index + 1]
+    if value.startswith('-'):
+        raise ValueError(f'Missing value for advanced FFmpeg option: {option}')
+    advanced.extend((option, value))
+    index += count + 1
 # Preserve the known-working 80/100 profile; other profiles cap at their target.
 peak = max(100, bitrate)
 print(f'Vídeo {bitrate} kb/s; máximo {peak} kb/s; audio 48 kb/s', flush=True)
+print('Advanced H.264 options: ' + (' '.join(shlex.quote(x) for x in advanced) if advanced else '(none)'), flush=True)
 assert 13 <= channel <= 62 and 0 <= gain <= 47
 def run(args): subprocess.run(args, cwd=stage, check=True)
 for name in ['correct_transport.py','build_si_trial.py','pat.bin','pmt.bin','sdt.bin','sdt.xml','nit.bin']:
@@ -27,12 +50,18 @@ freq = 473142857.142857 + (channel-13)*6000000
 nit = (root/'work/oneseg/nit.xml').read_text().replace('515142858',str(round(freq)))
 (work/'nit.xml').write_text(nit)
 run(['tstabcomp','--japan',str(work/'nit.xml'),'-o',str(work/'nit.bin')])
-run(['ffmpeg','-y','-hide_banner','-loglevel','warning','-i',source,'-map','0:v:0','-map','0:a:0?',
+ffmpeg_args = ['ffmpeg','-y','-hide_banner','-loglevel','warning','-i',source,'-map','0:v:0','-map','0:a:0?',
  '-vf','scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2,setsar=1','-r','15',
  '-c:v','libx264','-profile:v','baseline','-level:v','1.2','-pix_fmt','yuv420p','-b:v',f'{bitrate}k','-maxrate:v',f'{peak}k','-bufsize:v',f'{peak}k',
  '-g','15','-bf','0','-refs','1','-x264-params','repeat-headers=1:aud=1:scenecut=0:force-cfr=1',
  '-c:a','aac','-ar','24000','-ac','2','-b:a','48k','-mpegts_service_id','1544','-mpegts_pmt_start_pid','4096',
- '-streamid','0:256','-streamid','1:257','-muxrate','440563','-f','mpegts',str(work/'base_440563.ts')])
+ '-streamid','0:256','-streamid','1:257','-muxrate','440563']
+# Place experimental encoder flags after the safe baseline flags so they can
+# intentionally override GOP-related encoder defaults, but before the fixed TS output.
+ffmpeg_args.extend(advanced)
+ffmpeg_args.extend(['-f','mpegts',str(work/'base_440563.ts')])
+print('FFmpeg command: ' + ' '.join(shlex.quote(arg) for arg in ffmpeg_args), flush=True)
+run(ffmpeg_args)
 run([sys.executable,str(work/'correct_transport.py')])
 run([sys.executable,str(work/'build_si_trial.py')])
 template = (root/'studio_tx.py.template').read_text()
