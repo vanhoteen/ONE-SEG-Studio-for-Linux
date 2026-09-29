@@ -20,7 +20,7 @@ Created by **vanhoteen**, ONE SEG Studio prepares video and generates a Japanese
 
 ONE SEG Studio for Linux includes a **Spanish and English** interface. The language selector changes the complete application interface, including preparation, HackRF detection, transmission controls and status messages.
 
-![ONE SEG Studio for Linux — Spanish interface](Assets/linux-preview6.png)
+![ONE SEG Studio for Linux — Spanish interface](Assets/linux-preview-current.jpg)
 
 ## What has been tested?
 

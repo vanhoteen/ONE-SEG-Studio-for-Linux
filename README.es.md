@@ -20,7 +20,7 @@ Proyecto creado por **vanhoteen** para preparar vídeo y generar una señal de t
 
 ONE SEG Studio para Linux incluye interfaz en **castellano e inglés**. El selector cambia toda la aplicación, incluidos la preparación, la detección del HackRF, los controles de emisión y los mensajes de estado.
 
-![ONE SEG Studio para Linux — interfaz en castellano](Assets/linux-preview6.png)
+![ONE SEG Studio para Linux — interfaz en castellano](Assets/linux-preview-current.jpg)
 
 ## Prueba realizada
 
