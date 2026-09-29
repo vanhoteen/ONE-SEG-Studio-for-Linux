@@ -16,7 +16,19 @@ if amplifier_arg not in ('0', '1'):
     raise ValueError('Amplificador no válido')
 amplifier = amplifier_arg == '1'
 
-raw_command = sys.argv[6] if len(sys.argv) > 6 else ''
+def default_command(rate):
+    peak_rate = max(100, rate)
+    return (
+        "ffmpeg -y -hide_banner -loglevel warning -i INPUT -map 0:v:0 -map '0:a:0?' "
+        "-vf 'scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2,setsar=1' "
+        f"-r 15 -c:v libx264 -profile:v baseline -level:v 1.2 -pix_fmt yuv420p -b:v {rate}k "
+        f"-maxrate:v {peak_rate}k -bufsize:v {peak_rate}k -g 15 -bf 0 -refs 1 "
+        "-x264-params 'repeat-headers=1:aud=1:scenecut=0:force-cfr=1' "
+        "-c:a aac -ar 24000 -ac 2 -b:a 48k -mpegts_service_id 1544 "
+        "-mpegts_pmt_start_pid 4096 -streamid 0:256 -streamid 1:257 -muxrate 440563 -f mpegts OUTPUT"
+    )
+
+raw_command = sys.argv[6] if len(sys.argv) > 6 else default_command(bitrate)
 tokens = shlex.split(raw_command)
 if tokens[:1] == ['ffmpeg']:
     tokens = tokens[1:]
