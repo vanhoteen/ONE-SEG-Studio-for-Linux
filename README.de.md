@@ -20,7 +20,7 @@ Der Autor hat Installation und Empfang mit einem Sony XDV-D500 unter Ubuntu 26.0
 
 ## Installation
 
-Lade [**Onestudio_linux-ubuntu26-amd64-preview4-clean.zip aus Version 0.2**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.2/Onestudio_linux-ubuntu26-amd64-preview4-clean.zip) herunter. Die automatischen **Source code**-Archive sind keine Installer.
+Lade [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip aus Version 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip) herunter. Die automatischen **Source code**-Archive sind keine Installer.
 
 Den vollständigen Installer-Ordner herunterladen und entpacken. Beide `.deb`-Dateien, `INSTALL.sh`, `UBUNTU_VERSION` und `SHA256SUMS` zusammen lassen. Im Ordner ein Terminal öffnen:
 

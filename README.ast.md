@@ -20,7 +20,7 @@ L'autor probó la instalación y la recepción nuna Sony XDV-D500 con Ubuntu 26.
 
 ## Instalación
 
-Descarga [**Onestudio_linux-ubuntu26-amd64-preview4-clean.zip de la versión 0.2**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.2/Onestudio_linux-ubuntu26-amd64-preview4-clean.zip). Los archivos automáticos **Source code** nun son l'instalador.
+Descarga [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip de la versión 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). Los archivos automáticos **Source code** nun son l'instalador.
 
 Descarga y descomprime la carpeta completa. Caltién xuntos los dos `.deb`, `INSTALL.sh`, `UBUNTU_VERSION` y `SHA256SUMS`. Abre una terminal nella y executa:
 
