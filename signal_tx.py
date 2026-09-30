@@ -37,17 +37,22 @@ class Waveform(gr.sync_block):
 
 def main():
     directory = Path(sys.argv[1]).resolve()
+    waveform_enabled = '--waveform' in sys.argv[2:]
     sys.path.insert(0, str(directory))
     from studio_tx import studio_tx
     tb = studio_tx()
-    monitor = Waveform(directory/'waveform.json')
-    tb.connect(tb.rational_resampler_xxx_0, monitor)
+    if waveform_enabled:
+        monitor = Waveform(directory/'waveform.json')
+        tb.connect(tb.rational_resampler_xxx_0, monitor)
+        print('Monitor I/Q activo. Puede reducir el rendimiento en equipos lentos.', flush=True)
+    else:
+        print('Monitor I/Q desactivado. Modo de rendimiento activo.', flush=True)
     def stop(*_): tb.stop()
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
         tb.start()
-        print('Transmisor iniciado. Gráfica integrada activa.', flush=True)
+        print('Transmisor iniciado.', flush=True)
         tb.wait()
     finally:
         tb.stop()

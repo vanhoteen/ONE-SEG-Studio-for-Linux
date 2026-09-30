@@ -33,7 +33,8 @@ TEXT = {
         'ffmpeg_command': 'Comando FFmpeg editable', 'ffmpeg_hint': 'Puedes modificar vídeo, audio y GOP. INPUT y OUTPUT deben mantenerse.',
         'reset_profile': 'Restaurar perfil base',
         'vga_gain': 'Ganancia VGA', 'rf_amp': 'Amplificador RF', 'output': '  Señal de salida',
-        'graph': 'La gráfica aparecerá al emitir', 'log': 'Registro', 'stop': '■  Detener',
+        'iq_monitor': 'Monitor I/Q',
+        'graph': 'Monitor I/Q desactivado para priorizar la emisión', 'log': 'Registro', 'stop': '■  Detener',
         'transmit': '▶  Iniciar emisión', 'prepare': '✧  Preparar vídeo', 'tools': 'Comprobar herramientas',
         'device_unchecked': 'HackRF sin comprobar', 'choose_video': 'Tu próximo canal empieza aquí',
         'video_profile': 'Archivo de vídeo · perfil One-Seg', 'selected_video': 'Archivo de vídeo seleccionado · perfil One-Seg',
@@ -55,7 +56,8 @@ TEXT = {
         'ffmpeg_command': 'Editable FFmpeg command', 'ffmpeg_hint': 'Video, audio and GOP may be edited. Keep INPUT and OUTPUT.',
         'reset_profile': 'Restore baseline',
         'vga_gain': 'VGA gain', 'rf_amp': 'RF amplifier', 'output': '  OUTPUT SIGNAL',
-        'graph': 'The graph will appear during transmission', 'log': 'Log', 'stop': '■  Stop',
+        'iq_monitor': 'I/Q monitor',
+        'graph': 'I/Q monitor disabled to prioritize transmission', 'log': 'Log', 'stop': '■  Stop',
         'transmit': '▶  Start transmission', 'prepare': '✧  Prepare video', 'tools': 'Check tools',
         'device_unchecked': 'HackRF not checked', 'choose_video': 'Your next channel starts here',
         'video_profile': 'Video file · One-Seg profile', 'selected_video': 'Video file selected · One-Seg profile',
@@ -86,6 +88,7 @@ class Studio:
         self.rate = tk.StringVar(value='80')
         self.gain = tk.StringVar(value='47')
         self.amp = tk.BooleanVar(value=True)
+        self.waveform = tk.BooleanVar(value=False)
         self.ffmpeg_command = tk.StringVar()
         self.auto_ffmpeg_command = ''
         self.lang = 'es'
@@ -106,7 +109,7 @@ class Studio:
         self.configure_style()
         self.logo = self.load_logo()
         self.build()
-        for variable in (self.file, self.channel, self.rate, self.gain, self.amp, self.ffmpeg_command):
+        for variable in (self.file, self.channel, self.rate, self.gain, self.amp, self.waveform, self.ffmpeg_command):
             variable.trace_add('write', self.changed)
         self.changed()
         window.protocol('WM_DELETE_WINDOW', self.close)
@@ -288,6 +291,7 @@ class Studio:
         self.status_dot = tk.Label(footer, text='●', bg=CARD, fg='#9ca1a7', font=('TkDefaultFont', 13))
         self.status_dot.pack(side='left')
         self.label(footer, textvariable=self.status_text, size=11, weight='bold').pack(side='left', padx=(9, 24))
+        ttk.Checkbutton(footer, text=self.t('iq_monitor'), variable=self.waveform).pack(side='left')
         self.stop_button = ttk.Button(footer, text=self.t('stop'), style='Soft.TButton', command=self.stop)
         self.stop_button.pack(side='right')
         self.transmit_button = ttk.Button(footer, text=self.t('transmit'), style='Primary.TButton', command=self.transmit)
@@ -449,7 +453,10 @@ class Studio:
         if self.prepared is None or self.prepared != self.snapshot():
             messagebox.showerror(self.t('dialog_prepare'), self.t('prepare_first'))
             return
-        self.run([sys.executable, str(ROOT / 'signal_tx.py'), str(DATA / 'outputs')], self.t('transmitting'))
+        args = [sys.executable, str(ROOT / 'signal_tx.py'), str(DATA / 'outputs')]
+        if self.waveform.get():
+            args.append('--waveform')
+        self.run(args, self.t('transmitting'))
 
     def stop(self):
         if not self.process:
