@@ -115,7 +115,11 @@ import gnuradio.isdbt
 assert str(path) in gnuradio.isdbt.__file__
 print('Staged gr-isdbt imports successfully. No RF.')
 PY
-/usr/bin/python3 "$APP/linux/smoke.py"
+# The offline I/Q renderer imports gnuradio.isdbt.  Exercise the staged module
+# and its staged shared library, rather than relying on a host installation.
+PYTHONPATH="$STAGE/usr/lib/python3/dist-packages${PYTHONPATH:+:$PYTHONPATH}" \
+LD_LIBRARY_PATH="$LIBPATH${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+    /usr/bin/python3 "$APP/linux/smoke.py"
 dpkg-deb --root-owner-group --build "$STAGE" "$DIST/one-seg-studio_0.1.0~linuxpreview6_amd64.deb"
 cp "$ROOT/linux/install.sh" "$DIST/INSTALL.sh"
 printf '%s\n' "$VERSION_ID" > "$DIST/UBUNTU_VERSION"
