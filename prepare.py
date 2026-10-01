@@ -75,6 +75,8 @@ for key, value in {
     '__FREQUENCY__': repr(freq), '__GAIN__': repr(gain), '__AMPLIFIER__': repr(amplifier),
     '__LAYER_A__': repr(str(layer_a_iq)), '__LAYER_B__': repr(str(out/'layer_b_si_prueba.ts')),
     '__IQ_FILE__': repr(str(iq_path)),
+    # Mode 3 has 204 OFDM symbols per frame and 8,704 samples/symbol with 1/16 guard.
+    '__EXPECTED_SAMPLES__': repr(frames * 204 * (8192 + 512)),
 }.items():
     template = template.replace(key, value)
 compile(template, 'studio_iq.py', 'exec')
@@ -87,4 +89,5 @@ manifest = {
     'frames': frames, 'duration_seconds': iq_path.stat().st_size / 16_000_000,
 }
 (out/'oneseg-iq.json').write_text(json.dumps(manifest, indent=2) + '\n')
+print('IQ_PROGRESS 100', flush=True)
 print('Señal I/Q preparada. RF detenida.', flush=True)

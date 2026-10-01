@@ -40,7 +40,7 @@ TEXT = {
         'select_video': 'Elige un vídeo para preparar el canal', 'video_selected': 'Vídeo seleccionado · prepara el canal',
         'checking_tools': 'Comprobando herramientas · sin RF', 'checking_hackrf': 'Comprobando HackRF · sin RF',
         'device_ready': 'HackRF detectado y listo', 'device_detected': 'HackRF detectado · RF detenida',
-        'preparing': 'Preparando vídeo e I/Q · RF detenida', 'prepared': 'I/Q preparado · RF detenida',
+        'preparing': 'Preparando vídeo e I/Q · 0% · RF detenida', 'prepared': 'I/Q preparado · RF detenida',
         'transmitting': 'Emisión activa · consulta el registro', 'stopped': 'Emisión detenida',
         'completed': 'Operación terminada', 'failed': 'Falló · consulta el registro',
         'dialog_video': 'Vídeo', 'choose_first': 'Elige primero un archivo de vídeo.',
@@ -62,7 +62,7 @@ TEXT = {
         'select_video': 'Choose a video to prepare the channel', 'video_selected': 'Video selected · prepare the channel',
         'checking_tools': 'Checking tools · RF stopped', 'checking_hackrf': 'Checking HackRF · no RF stream',
         'device_ready': 'HackRF detected and ready', 'device_detected': 'HackRF detected · RF stopped',
-        'preparing': 'Preparing video and I/Q · RF stopped', 'prepared': 'I/Q prepared · RF stopped',
+        'preparing': 'Preparing video and I/Q · 0% · RF stopped', 'prepared': 'I/Q prepared · RF stopped',
         'transmitting': 'Transmission active · see log', 'stopped': 'Transmission stopped',
         'completed': 'Operation completed', 'failed': 'Failed · see log',
         'dialog_video': 'Video', 'choose_first': 'Choose a video file first.',
@@ -379,6 +379,7 @@ class Studio:
         self.completed = completed
         self.output = tempfile.TemporaryFile()
         self.offset = 0
+        self.progress_label = label
         try:
             self.process = subprocess.Popen(args, cwd=ROOT, stdout=self.output,
                 stderr=subprocess.STDOUT, start_new_session=True,
@@ -398,7 +399,19 @@ class Studio:
         chunk = os.pread(self.output.fileno(), 65536, self.offset)
         self.offset += len(chunk)
         if chunk:
-            self.append(chunk.decode('utf-8', errors='replace'))
+            text = chunk.decode('utf-8', errors='replace')
+            self.append(text)
+            for line in text.splitlines():
+                if line.startswith('IQ_PROGRESS '):
+                    try:
+                        percent = max(0, min(100, int(line.split()[1])))
+                    except (IndexError, ValueError):
+                        continue
+                    if self.progress_label == self.t('preparing'):
+                        if self.lang == 'es':
+                            self.set_status(f'Preparando vídeo e I/Q · {percent}% · RF detenida', '#f5a623')
+                        else:
+                            self.set_status(f'Preparing video and I/Q · {percent}% · RF stopped', '#f5a623')
         result = self.process.poll()
         if result is None or chunk:
             self.window.after(100, self.poll)

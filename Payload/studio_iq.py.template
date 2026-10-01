@@ -33,11 +33,14 @@ class CS8FileSink(gr.sync_block):
     This is deliberately a sink: rendering happens before RF starts, so it
     never needs to satisfy the HackRF clock in real time.
     """
-    def __init__(self, destination):
+    def __init__(self, destination, expected_samples):
         gr.sync_block.__init__(self, name="CS8 file sink", in_sig=[np.complex64], out_sig=None)
         self.destination = destination
         self.handle = open(destination, "wb", buffering=1024 * 1024)
         self.samples = 0
+        self.expected_samples = max(1, expected_samples)
+        self.next_progress = 5
+        print('IQ_PROGRESS 0', flush=True)
 
     def work(self, inputs, outputs):
         values = inputs[0]
@@ -50,6 +53,10 @@ class CS8FileSink(gr.sync_block):
             iq[1::2] = imag
             self.handle.write(iq.tobytes())
             self.samples += len(values)
+            progress = min(99, int(self.samples * 100 / self.expected_samples))
+            if progress >= self.next_progress:
+                print(f'IQ_PROGRESS {progress}', flush=True)
+                self.next_progress = min(100, progress + 5)
         return len(values)
 
     def close(self):
@@ -93,7 +100,7 @@ class studio_iq(gr.top_block):
         ##################################################
 
         # Render to signed 8-bit interleaved I/Q. No SDR device is opened here.
-        self.cs8_file_sink = CS8FileSink(__IQ_FILE__)
+        self.cs8_file_sink = CS8FileSink(__IQ_FILE__, __EXPECTED_SAMPLES__)
         self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
                 interpolation=63,
                 decimation=64,
