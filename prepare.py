@@ -1,6 +1,6 @@
 """Prepare an isolated, finite One-Seg file test. Never starts RF."""
 from pathlib import Path
-import sys, subprocess, shutil, os, shlex
+import sys, subprocess, shutil, os, shlex, json
 root = Path(__file__).resolve().parent/'Payload'
 stage = Path(os.environ['ONESEG_DATA'])
 work = stage/'work/oneseg'
@@ -54,9 +54,36 @@ print('FFmpeg command: ' + ' '.join(shlex.quote(arg) for arg in ffmpeg_args), fl
 run(ffmpeg_args)
 run([sys.executable,str(work/'correct_transport.py')])
 run([sys.executable,str(work/'build_si_trial.py')])
-template = (root/'studio_tx.py.template').read_text()
-for key, value in {'__FREQUENCY__': repr(freq), '__GAIN__': repr(gain), '__AMPLIFIER__': repr(amplifier), '__LAYER_A__': repr(str(out/'layer_a_si_prueba.ts')), '__LAYER_B__': repr(str(out/'layer_b_si_prueba.ts'))}.items():
+# Match the browser renderer: fill the final partial frame with null TS packets
+# and add four frames to flush the ISDB-T interleavers before RF playback.
+layer_a = out/'layer_a_si_prueba.ts'
+layer_a_iq = out/'layer_a_iq.ts'
+packet_size, frame_packets = 188, 64
+source_bytes = layer_a.read_bytes()
+if not source_bytes or len(source_bytes) % packet_size:
+    raise RuntimeError('La capa A no está alineada a paquetes MPEG-TS de 188 bytes.')
+frame_bytes = packet_size * frame_packets
+frames = (len(source_bytes) + frame_bytes - 1) // frame_bytes + 4
+null_packet = bytes([0x47, 0x1f, 0xff, 0x10]) + bytes([0xff]) * 184
+padding_packets = (frames * frame_bytes - len(source_bytes)) // packet_size
+layer_a_iq.write_bytes(source_bytes + null_packet * padding_packets)
+
+iq_path = out/'oneseg.cs8'
+template = (root/'studio_iq.py.template').read_text()
+for key, value in {
+    '__FREQUENCY__': repr(freq), '__GAIN__': repr(gain), '__AMPLIFIER__': repr(amplifier),
+    '__LAYER_A__': repr(str(layer_a_iq)), '__LAYER_B__': repr(str(out/'layer_b_si_prueba.ts')),
+    '__IQ_FILE__': repr(str(iq_path)),
+}.items():
     template = template.replace(key, value)
-compile(template, 'studio_tx.py', 'exec')
-(out/'studio_tx.py').write_text(template)
-print('Preparación terminada. RF detenida.',flush=True)
+compile(template, 'studio_iq.py', 'exec')
+(out/'studio_iq.py').write_text(template)
+print(f'Renderizando {frames} tramas ISDB-T a I/Q local. El HackRF permanece apagado.', flush=True)
+run([sys.executable, str(root/'render_iq.py'), str(out)])
+manifest = {
+    'format': 'CS8', 'sample_rate': 8_000_000, 'frequency_hz': round(freq),
+    'vga_gain': gain, 'amplifier': amplifier, 'iq_file': iq_path.name,
+    'frames': frames, 'duration_seconds': iq_path.stat().st_size / 16_000_000,
+}
+(out/'oneseg-iq.json').write_text(json.dumps(manifest, indent=2) + '\n')
+print('Señal I/Q preparada. RF detenida.', flush=True)

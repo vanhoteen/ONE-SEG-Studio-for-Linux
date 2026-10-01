@@ -67,7 +67,7 @@ mkdir -p "$APP/linux" "$STAGE/usr/bin" "$STAGE/usr/share/applications" \
     "$STAGE/usr/share/icons/hicolor/256x256/apps" "$STAGE/DEBIAN" \
     "$STAGE/usr/share/doc/one-seg-studio"
 cp -R "$ROOT/Payload" "$APP/"
-cp "$ROOT/prepare.py" "$ROOT/signal_tx.py" "$APP/"
+cp "$ROOT/prepare.py" "$ROOT/render_iq.py" "$ROOT/signal_tx.py" "$APP/"
 cp "$ROOT/linux/studio.py" "$ROOT/linux/check.py" "$ROOT/linux/smoke.py" "$APP/linux/"
 mkdir -p "$APP/Assets"
 cp "$ROOT/Assets/one-seg-logo.png" "$APP/Assets/one-seg-logo.png"

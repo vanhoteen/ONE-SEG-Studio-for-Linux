@@ -40,7 +40,7 @@ TEXT = {
         'select_video': 'Elige un vídeo para preparar el canal', 'video_selected': 'Vídeo seleccionado · prepara el canal',
         'checking_tools': 'Comprobando herramientas · sin RF', 'checking_hackrf': 'Comprobando HackRF · sin RF',
         'device_ready': 'HackRF detectado y listo', 'device_detected': 'HackRF detectado · RF detenida',
-        'preparing': 'Preparando vídeo · RF detenida', 'prepared': 'Canal preparado · RF detenida',
+        'preparing': 'Preparando vídeo e I/Q · RF detenida', 'prepared': 'I/Q preparado · RF detenida',
         'transmitting': 'Emisión activa · consulta el registro', 'stopped': 'Emisión detenida',
         'completed': 'Operación terminada', 'failed': 'Falló · consulta el registro',
         'dialog_video': 'Vídeo', 'choose_first': 'Elige primero un archivo de vídeo.',
@@ -62,7 +62,7 @@ TEXT = {
         'select_video': 'Choose a video to prepare the channel', 'video_selected': 'Video selected · prepare the channel',
         'checking_tools': 'Checking tools · RF stopped', 'checking_hackrf': 'Checking HackRF · no RF stream',
         'device_ready': 'HackRF detected and ready', 'device_detected': 'HackRF detected · RF stopped',
-        'preparing': 'Preparing video · RF stopped', 'prepared': 'Channel prepared · RF stopped',
+        'preparing': 'Preparing video and I/Q · RF stopped', 'prepared': 'I/Q prepared · RF stopped',
         'transmitting': 'Transmission active · see log', 'stopped': 'Transmission stopped',
         'completed': 'Operation completed', 'failed': 'Failed · see log',
         'dialog_video': 'Video', 'choose_first': 'Choose a video file first.',
@@ -269,7 +269,7 @@ class Studio:
         signal_head.pack(fill='x')
         self.label(signal_head, '⌁', size=16, weight='bold', fg=NAVY).pack(side='left')
         self.label(signal_head, self.t('output'), size=11, weight='bold', fg=NAVY).pack(side='left')
-        self.label(signal_head, 'I/Q', size=9, weight='bold', fg=RED).pack(side='right')
+        self.label(signal_head, 'CS8 · I/Q local', size=9, weight='bold', fg=RED).pack(side='right')
         graph = tk.Canvas(body, height=105, bg=NAVY, highlightthickness=0)
         graph.pack(fill='x')
         graph.bind('<Configure>', self.draw_graph)

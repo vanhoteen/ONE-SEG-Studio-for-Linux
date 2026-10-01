@@ -1,57 +1,45 @@
-"""Headless transmitter and throttled local waveform snapshots for the studio UI."""
+"""Play a prepared CS8 I/Q file through HackRF. RF starts only here."""
 import json
-import os
 from pathlib import Path
 import signal
+import subprocess
 import sys
-import time
 
-import numpy as np
-from gnuradio import gr
+child = None
 
 
-class Waveform(gr.sync_block):
-    def __init__(self, destination):
-        gr.sync_block.__init__(self, name='Studio waveform', in_sig=[np.complex64], out_sig=None)
-        self.destination = Path(destination)
-        self.next_update = 0.0
-
-    def work(self, inputs, outputs):
-        samples = inputs[0]
-        now = time.monotonic()
-        if len(samples) and now >= self.next_update:
-            self.next_update = now + 0.25
-            # A consecutive short window, not a decimated RF quality estimate.
-            window = samples[:256]
-            data = {'i': window.real.tolist(), 'q': window.imag.tolist(),
-                    'rms': float(np.sqrt(np.mean(np.abs(samples)**2))),
-                    'peak': float(np.max(np.abs(samples))), 'time': time.time()}
-            try:
-                temporary = self.destination.with_suffix('.tmp')
-                temporary.write_text(json.dumps(data, allow_nan=False))
-                os.replace(temporary, self.destination)
-            except (OSError, ValueError):
-                pass  # Display failures must not stop the transmitter.
-        return len(samples)
+def stop(*_):
+    global child
+    if child and child.poll() is None:
+        child.terminate()
 
 
 def main():
+    global child
     directory = Path(sys.argv[1]).resolve()
-    sys.path.insert(0, str(directory))
-    from studio_tx import studio_tx
-    tb = studio_tx()
-    monitor = Waveform(directory/'waveform.json')
-    tb.connect(tb.rational_resampler_xxx_0, monitor)
-    def stop(*_): tb.stop()
+    manifest = directory / 'oneseg-iq.json'
+    iq = directory / 'oneseg.cs8'
+    if not manifest.is_file() or not iq.is_file() or iq.stat().st_size == 0:
+        raise RuntimeError('No hay una señal I/Q preparada. Pulsa Preparar vídeo antes de emitir.')
+    settings = json.loads(manifest.read_text())
+    if settings.get('format') != 'CS8' or settings.get('sample_rate') != 8_000_000:
+        raise RuntimeError('La señal preparada no tiene el formato I/Q esperado.')
+    args = [
+        'hackrf_transfer', '-t', str(iq), '-f', str(settings['frequency_hz']),
+        '-s', '8000000', '-x', str(settings['vga_gain']),
+        '-a', '1' if settings['amplifier'] else '0',
+    ]
+    print('Iniciando reproducción I/Q preparada mediante HackRF.', flush=True)
+    print(f"Frecuencia: {settings['frequency_hz']} Hz · VGA: {settings['vga_gain']} dB · AMP: {'on' if settings['amplifier'] else 'off'}", flush=True)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
-    try:
-        tb.start()
-        print('Transmisor iniciado. Gráfica integrada activa.', flush=True)
-        tb.wait()
-    finally:
-        tb.stop()
-        tb.wait()
+    child = subprocess.Popen(args)
+    status = child.wait()
+    child = None
+    if status:
+        raise SystemExit(status)
+    print('Reproducción I/Q terminada. RF detenida.', flush=True)
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()
