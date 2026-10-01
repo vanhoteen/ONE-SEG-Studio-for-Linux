@@ -265,15 +265,6 @@ class Studio:
         self.label(amp_row, self.t('rf_amp'), size=11, weight='bold').pack(side='left')
         ttk.Checkbutton(amp_row, variable=self.amp).pack(side='right')
 
-        signal_head = tk.Frame(body, bg=PAPER, pady=18)
-        signal_head.pack(fill='x')
-        self.label(signal_head, '⌁', size=16, weight='bold', fg=NAVY).pack(side='left')
-        self.label(signal_head, self.t('output'), size=11, weight='bold', fg=NAVY).pack(side='left')
-        self.label(signal_head, 'CS8 · I/Q local', size=9, weight='bold', fg=RED).pack(side='right')
-        graph = tk.Canvas(body, height=105, bg=NAVY, highlightthickness=0)
-        graph.pack(fill='x')
-        graph.bind('<Configure>', self.draw_graph)
-
         log_frame = self.card(body, padx=16, pady=10)
         log_frame.pack(fill='both', expand=True, pady=(17, 0))
         log_top = tk.Frame(log_frame, bg=CARD)
@@ -297,15 +288,6 @@ class Studio:
         self.tools_button = ttk.Button(footer, text=self.t('tools'), style='Soft.TButton', command=self.check)
         self.tools_button.pack(side='right', padx=(0, 10))
         self.actions = [self.detect_button, self.tools_button, self.prepare_button, self.transmit_button]
-
-    def draw_graph(self, event):
-        canvas = event.widget
-        canvas.delete('all')
-        width, height = event.width, event.height
-        for y in range(16, height, 25):
-            canvas.create_line(16, y, width - 16, y, fill='#31495e')
-        canvas.create_text(width // 2, height // 2, text=self.t('graph'), fill='#a8b2bd',
-                           font=('TkDefaultFont', 10, 'bold'))
 
     def safe_ffmpeg_command(self):
         bitrate = int(self.rate.get())
