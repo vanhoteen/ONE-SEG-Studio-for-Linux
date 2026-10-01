@@ -1,7 +1,8 @@
 """Prepare an isolated, finite One-Seg file test. Never starts RF."""
 from pathlib import Path
 import sys, subprocess, shutil, os, shlex, json
-root = Path(__file__).resolve().parent/'Payload'
+app_root = Path(__file__).resolve().parent
+root = app_root/'Payload'
 stage = Path(os.environ['ONESEG_DATA'])
 work = stage/'work/oneseg'
 out = stage/'outputs'
@@ -79,7 +80,7 @@ for key, value in {
 compile(template, 'studio_iq.py', 'exec')
 (out/'studio_iq.py').write_text(template)
 print(f'Renderizando {frames} tramas ISDB-T a I/Q local. El HackRF permanece apagado.', flush=True)
-run([sys.executable, str(root/'render_iq.py'), str(out)])
+run([sys.executable, str(app_root/'render_iq.py'), str(out)])
 manifest = {
     'format': 'CS8', 'sample_rate': 8_000_000, 'frequency_hz': round(freq),
     'vga_gain': gain, 'amplifier': amplifier, 'iq_file': iq_path.name,
