@@ -40,6 +40,14 @@ bash INSTALL.sh
 
 Introduce la contraseña de administrador y espera. Se comprueban los paquetes y se instalan ONE SEG Studio, TSDuck y las dependencias de Ubuntu: GNU Radio, FFmpeg, Python y soporte para HackRF. **Necesita Internet; no hay que compilar en el ordenador de destino.** Reutiliza las dependencias existentes. No es un paquete autónomo como el DMG de Mac.
 
+## Edición para ordenadores con pocos recursos — I/Q sin conexión
+
+> **Versión de prueba opcional y separada.** Si la edición Linux normal muestra vídeo intermitente, fotogramas negros o ausencia de señal en un ordenador poco potente, prueba la [edición I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). Genera el archivo I/Q completo **antes** de abrir el HackRF. Al emitir, el HackRF reproduce ese archivo ya preparado, con menos trabajo de CPU en tiempo real y sin pausas de modulación durante la salida RF. La preparación tarda más y necesita espacio libre en disco; está pensada para experimentar, no como versión predeterminada.
+>
+> Esta edición también conserva el **comando FFmpeg editable** para experimentar con vídeo, audio, GOP y MPEG-TS. Al editarlo, conserva `INPUT`, el marcador final `OUTPUT` y el formato de salida `mpegts`.
+>
+> Descarga [el ZIP instalador I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímelo, entra en `linux-ubuntu26-amd64`, ejecuta `sha256sum -c SHA256SUMS` y después `bash INSTALL.sh`. Sustituye temporalmente la aplicación normal instalada y aparecerá como ONE SEG Studio en Aplicaciones; reinstala después la versión normal si quieres volver a ella.
+
 ## Controles experimentales del codificador y registros
 
 La vista previa Linux muestra el **comando FFmpeg completo y editable** para experimentar con receptores. Su perfil base que funciona es `320×240`, `15 fps`, H.264 Baseline nivel 1.2, `-g 15 -bf 0 -refs 1`, cabeceras repetidas, AAC 24 kHz / 48 kb/s y los ajustes de transporte One-Seg. El usuario puede modificar argumentos de vídeo, audio, GOP y TS antes de preparar. Deben conservarse el marcador `INPUT`, el marcador final `OUTPUT` y el formato de salida `mpegts`. Cada operación también guarda un registro en `~/.local/share/one-seg-studio/logs/`.
