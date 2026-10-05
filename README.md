@@ -40,6 +40,14 @@ bash INSTALL.sh
 
 Enter your administrator password and wait. The installer verifies the packages and installs ONE SEG Studio, TSDuck and the required Ubuntu dependencies, including GNU Radio, FFmpeg, Python and HackRF support. **Internet is required; no compilation is needed on the destination computer.** Existing dependencies are reused. The small download is not a self-contained runtime like the Mac DMG.
 
+## Low-resource computer edition — Offline I/Q test
+
+> **Optional separate test release.** If the normal Linux version gives intermittent video, black frames or no signal on a low-power computer, try the [Offline I/Q test release](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). It renders the complete I/Q file **before** opening the HackRF. Transmit then plays that prepared file, reducing real-time CPU work and avoiding modulation pauses during RF output. Preparation takes longer and needs free disk space; it is intended for experiments, not as the default release.
+>
+> This edition also keeps the **editable FFmpeg command** for video, audio, GOP and MPEG-TS experiments. Keep `INPUT`, the final `OUTPUT` placeholder and the `mpegts` output format when editing.
+>
+> Download [the Offline I/Q installer ZIP](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), extract it, enter `linux-ubuntu26-amd64`, run `sha256sum -c SHA256SUMS`, then run `bash INSTALL.sh`. It temporarily replaces the installed normal application and appears as ONE SEG Studio in Applications; reinstall the normal release afterwards if you want to return to it.
+
 ## Experimental encoder controls and logs
 
 The Linux preview shows the complete **editable FFmpeg command** for receiver experiments. Its known-working baseline is `320×240`, `15 fps`, H.264 Baseline level 1.2, `-g 15 -bf 0 -refs 1`, repeat headers, AAC 24 kHz / 48 kb/s and the One-Seg transport settings. The user may modify video, audio, GOP and TS encoder arguments before preparation. `INPUT` and the final `OUTPUT` placeholder must remain; the output format must remain `mpegts`. Each operation also writes a log in `~/.local/share/one-seg-studio/logs/`.

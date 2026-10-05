@@ -32,6 +32,14 @@ Necesites Internet y contraseña d'alministrador. Instálense la aplicación, TS
 
 Conecta HackRF, pulsa **Check tools** y **Detect HackRF**, escueyi un vídeo y pulsa **Prepare video**. **Transmit** entama la emisión; **Stop** pá­rala. La instalación y la preparación nun emiten.
 
+## Edición pa ordenadores con pocos recursos — I/Q ensin conexón
+
+> **Versión de pruebes opcional y separada.** Si la versión Linux normal amuesa vídeo intermitente, fotogrames negros o ensin señal nun ordenador poco potente, prueba la [edición I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). Xenera'l ficheru I/Q completu **enantes** d'abrir el HackRF. Al emitir, HackRF reproduce esi ficheru preparáu, reduciendo'l trabayu de CPU en tiempu real y evitando pauses de modulación na salida RF. La preparación tarda más y necesita espaciu llibre nel discu; ta pensada pa esperimentos, non como versión predeterminada.
+>
+> Esta edición caltién tamién el **comandu FFmpeg editable** pa esperimentar con vídeo, audiu, GOP y MPEG-TS. Al editalu, caltién `INPUT`, el marcador final `OUTPUT` y el formatu de salida `mpegts`.
+>
+> Descarga [el ZIP instalador I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímilu, entra en `linux-ubuntu26-amd64`, executa `sha256sum -c SHA256SUMS` y depués `bash INSTALL.sh`. Sustitúi temporalmente l'aplicación normal instalada y va apaecer como ONE SEG Studio nel menú d'aplicaciones; reinstala depués la versión normal si quies volver a ella.
+
 ## Llendes y responsabilidá
 
 Interfaz disponible en castellanu ya inglés. Nun inclúi cámara nin gráfica integrada; nun garantiza un bucle continuu nin certificación de la norma. Comprueba les frecuencies, potencies y permisos del to país antes d'emitir. Un canal xaponés nun da autorización local. Evita interferencies; l'usuariu ye responsable de los permisos y del usu del equipu. Na midida permitida pola llei, l'autor nun asume responsabilidá por usos non autorizaos o interferencies causaes pol usuariu.
