@@ -20,7 +20,7 @@ L'autor probó la instalación y la recepción nuna Sony XDV-D500 con Ubuntu 26.
 
 ## Instalación
 
-Descarga [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip de la versión 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). Los archivos automáticos **Source code** nun son l'instalador.
+Descarga [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip de la versión 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). Los archivos automáticos **Source code** nun son l'instalador.
 
 Descarga y descomprime la carpeta completa. Caltién xuntos los dos `.deb`, `INSTALL.sh`, `UBUNTU_VERSION` y `SHA256SUMS`. Abre una terminal nella y executa:
 
@@ -34,11 +34,11 @@ Conecta HackRF, pulsa **Check tools** y **Detect HackRF**, escueyi un vídeo y p
 
 ## Edición pa ordenadores con pocos recursos — I/Q ensin conexón
 
-> **Versión de pruebes opcional y separada.** Si la versión Linux normal amuesa vídeo intermitente, fotogrames negros o ensin señal nun ordenador poco potente, prueba la [edición I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). Xenera'l ficheru I/Q completu **enantes** d'abrir el HackRF. Al emitir, HackRF reproduce esi ficheru preparáu, reduciendo'l trabayu de CPU en tiempu real y evitando pauses de modulación na salida RF. La preparación tarda más y necesita espaciu llibre nel discu; ta pensada pa esperimentos, non como versión predeterminada.
+> **Versión de pruebes opcional y separada.** Si la versión Linux normal amuesa vídeo intermitente, fotogrames negros o ensin señal nun ordenador poco potente, prueba la [edición I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/tag/offline-iq-test-0.1). Xenera'l ficheru I/Q completu **enantes** d'abrir el HackRF. Al emitir, HackRF reproduce esi ficheru preparáu, reduciendo'l trabayu de CPU en tiempu real y evitando pauses de modulación na salida RF. La preparación tarda más y necesita espaciu llibre nel discu; ta pensada pa esperimentos, non como versión predeterminada.
 >
 > Esta edición caltién tamién el **comandu FFmpeg editable** pa esperimentar con vídeo, audiu, GOP y MPEG-TS. Al editalu, caltién `INPUT`, el marcador final `OUTPUT` y el formatu de salida `mpegts`.
 >
-> Descarga [el ZIP instalador I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímilu, entra en `linux-ubuntu26-amd64`, executa `sha256sum -c SHA256SUMS` y depués `bash INSTALL.sh`. Sustitúi temporalmente l'aplicación normal instalada y va apaecer como ONE SEG Studio nel menú d'aplicaciones; reinstala depués la versión normal si quies volver a ella.
+> Descarga [el ZIP instalador I/Q ensin conexón](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímilu, entra en `linux-ubuntu26-amd64`, executa `sha256sum -c SHA256SUMS` y depués `bash INSTALL.sh`. Sustitúi temporalmente l'aplicación normal instalada y va apaecer como ONE SEG Studio nel menú d'aplicaciones; reinstala depués la versión normal si quies volver a ella.
 
 ## Llendes y responsabilidá
 

@@ -28,9 +28,9 @@ El autor ha compilado e instalado esta versión en Ubuntu 26.04 amd64 y ha confi
 
 ## Descargar e instalar
 
-[Releases — descargas del instalador](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases)
+[Releases — descargas del instalador](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases)
 
-Descarga [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip de la versión 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). Los archivos automáticos **Source code** de GitHub son el código para compilar, no el instalador.
+Descarga [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip de la versión 0.3**](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). Los archivos automáticos **Source code** de GitHub son el código para compilar, no el instalador.
 
 Descarga y descomprime la **carpeta completa del instalador**. Conserva juntos los dos `.deb`, `INSTALL.sh`, `UBUNTU_VERSION` y `SHA256SUMS`. Abre una terminal en esa carpeta y ejecuta:
 
@@ -42,11 +42,11 @@ Introduce la contraseña de administrador y espera. Se comprueban los paquetes y
 
 ## Edición para ordenadores con pocos recursos — I/Q sin conexión
 
-> **Versión de prueba opcional y separada.** Si la edición Linux normal muestra vídeo intermitente, fotogramas negros o ausencia de señal en un ordenador poco potente, prueba la [edición I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). Genera el archivo I/Q completo **antes** de abrir el HackRF. Al emitir, el HackRF reproduce ese archivo ya preparado, con menos trabajo de CPU en tiempo real y sin pausas de modulación durante la salida RF. La preparación tarda más y necesita espacio libre en disco; está pensada para experimentar, no como versión predeterminada.
+> **Versión de prueba opcional y separada.** Si la edición Linux normal muestra vídeo intermitente, fotogramas negros o ausencia de señal en un ordenador poco potente, prueba la [edición I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/tag/offline-iq-test-0.1). Genera el archivo I/Q completo **antes** de abrir el HackRF. Al emitir, el HackRF reproduce ese archivo ya preparado, con menos trabajo de CPU en tiempo real y sin pausas de modulación durante la salida RF. La preparación tarda más y necesita espacio libre en disco; está pensada para experimentar, no como versión predeterminada.
 >
 > Esta edición también conserva el **comando FFmpeg editable** para experimentar con vídeo, audio, GOP y MPEG-TS. Al editarlo, conserva `INPUT`, el marcador final `OUTPUT` y el formato de salida `mpegts`.
 >
-> Descarga [el ZIP instalador I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímelo, entra en `linux-ubuntu26-amd64`, ejecuta `sha256sum -c SHA256SUMS` y después `bash INSTALL.sh`. Sustituye temporalmente la aplicación normal instalada y aparecerá como ONE SEG Studio en Aplicaciones; reinstala después la versión normal si quieres volver a ella.
+> Descarga [el ZIP instalador I/Q sin conexión](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), descomprímelo, entra en `linux-ubuntu26-amd64`, ejecuta `sha256sum -c SHA256SUMS` y después `bash INSTALL.sh`. Sustituye temporalmente la aplicación normal instalada y aparecerá como ONE SEG Studio en Aplicaciones; reinstala después la versión normal si quieres volver a ella.
 
 ## Controles experimentales del codificador y registros
 

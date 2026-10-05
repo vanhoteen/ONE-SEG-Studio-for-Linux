@@ -28,9 +28,9 @@ The author successfully compiled and installed this Linux preview on Ubuntu 26.0
 
 ## Download and installation
 
-[Open Releases — installer downloads](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases)
+[Open Releases — installer downloads](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases)
 
-Download [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip** from release 0.3](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). GitHub's automatic **Source code** archives are for building, not the ready-to-install package.
+Download [**ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip** from release 0.3](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/0.3/ONE-SEG-Studio-Linux-preview6-Ubuntu26-amd64.zip). GitHub's automatic **Source code** archives are for building, not the ready-to-install package.
 
 Download and extract the **complete installer folder**. Keep both `.deb` packages, `INSTALL.sh`, `UBUNTU_VERSION` and `SHA256SUMS` together. Open a terminal in that folder and run:
 
@@ -42,11 +42,11 @@ Enter your administrator password and wait. The installer verifies the packages 
 
 ## Low-resource computer edition — Offline I/Q test
 
-> **Optional separate test release.** If the normal Linux version gives intermittent video, black frames or no signal on a low-power computer, try the [Offline I/Q test release](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/tag/offline-iq-test-0.1). It renders the complete I/Q file **before** opening the HackRF. Transmit then plays that prepared file, reducing real-time CPU work and avoiding modulation pauses during RF output. Preparation takes longer and needs free disk space; it is intended for experiments, not as the default release.
+> **Optional separate test release.** If the normal Linux version gives intermittent video, black frames or no signal on a low-power computer, try the [Offline I/Q test release](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/tag/offline-iq-test-0.1). It renders the complete I/Q file **before** opening the HackRF. Transmit then plays that prepared file, reducing real-time CPU work and avoiding modulation pauses during RF output. Preparation takes longer and needs free disk space; it is intended for experiments, not as the default release.
 >
 > This edition also keeps the **editable FFmpeg command** for video, audio, GOP and MPEG-TS experiments. Keep `INPUT`, the final `OUTPUT` placeholder and the `mpegts` output format when editing.
 >
-> Download [the Offline I/Q installer ZIP](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux---Ubuntu-26.04-amd64-Preview/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), extract it, enter `linux-ubuntu26-amd64`, run `sha256sum -c SHA256SUMS`, then run `bash INSTALL.sh`. It temporarily replaces the installed normal application and appears as ONE SEG Studio in Applications; reinstall the normal release afterwards if you want to return to it.
+> Download [the Offline I/Q installer ZIP](https://github.com/vanhoteen/ONE-SEG-Studio-for-Linux/releases/download/offline-iq-test-0.1/ONE-SEG-Studio-offline-iq-preview7-Ubuntu26-amd64.zip), extract it, enter `linux-ubuntu26-amd64`, run `sha256sum -c SHA256SUMS`, then run `bash INSTALL.sh`. It temporarily replaces the installed normal application and appears as ONE SEG Studio in Applications; reinstall the normal release afterwards if you want to return to it.
 
 ## Experimental encoder controls and logs
 
